@@ -1,0 +1,273 @@
+---
+format:
+  pdf:
+    papersize: letter
+    geometry: margin=1in
+    fontsize: 11pt
+    mainfont: "Lato"
+    linestretch: 1.15
+    colorlinks: true
+    urlcolor: black
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(readr)
+
+# Function to format publications with proper spacing and consistent font
+format_publications <- function(data) {
+  # Create citations
+  citations <- data %>%
+    arrange(desc(year)) %>%
+    mutate(
+      citation = paste0(
+        authors, " (", year, "). ",
+        title, ". ",
+        journal
+      )
+    ) %>%
+    pull(citation)
+  
+  # Create a data frame with blank rows between citations
+  n_citations <- length(citations)
+  formatted_df <- data.frame(
+    citation = character(n_citations * 2 - 1)
+  )
+  
+  # Fill in citations and blank rows
+  for(i in 1:n_citations) {
+    formatted_df$citation[2*i - 1] <- citations[i]
+    if(i < n_citations) {
+      formatted_df$citation[2*i] <- ""  # Insert blank row
+    }
+  }
+  
+  # Create table with kable
+  formatted_df %>%
+    kable(format = "pipe", 
+          col.names = NULL) %>%
+    kable_styling(font_size = 11,
+                  full_width = TRUE,
+                  bootstrap_options = "condensed") %>%
+    column_spec(1, width = "6.5in")
+}
+
+# Function to create tables with consistent styling
+create_table <- function(data, widths = NULL, align = NULL) {
+  if (is.null(align)) {
+    align = rep("l", ncol(data))
+  }
+  
+  total_width <- sum(as.numeric(gsub("in", "", widths)))
+  if (total_width > 6.5) {
+    scaling_factor <- 6.5 / total_width
+    widths <- paste0(as.numeric(gsub("in", "", widths)) * scaling_factor, "in")
+  }
+  
+  tbl <- data %>%
+    kable(format = "pipe", 
+          align = align,
+          col.names = NULL,
+          escape = FALSE) %>%
+    kable_styling(font_size = 11,
+                  full_width = TRUE,
+                  bootstrap_options = "condensed")
+  
+  if (!is.null(widths)) {
+    for (i in 1:length(widths)) {
+      tbl <- tbl %>% column_spec(i, width = widths[i])
+    }
+  }
+  
+  return(tbl)
+}
+```
+
+::: {style="text-align: center; margin-bottom: 20pt"}
+# GERARD CHUNG
+
+Assistant Professor\
+Department of Social Work\
+National University of Singapore\
+gerard\@nus.edu.sg • gerardchung.com
+
+*Last Updated: December 2024*
+
+:::
+
+# EDUCATION
+
+```{r}
+tribble(
+  ~Degree, ~Year, ~Institution, ~Location,
+  "Ph.D. in Social Work", "2021", "University of North Carolina at Chapel Hill", "USA",
+  "Master of Social Work", "2016", "National University of Singapore", "Singapore",
+  "Bachelor of Arts (Social Work)", "2007", "National University of Singapore", "Singapore",
+  "Graduate Diploma in Solution-focused Brief Therapy", "2011", "Edith Cowan University", "Australia"
+) %>%
+  arrange(desc(Year)) %>%
+  create_table(widths = c("2.5in", "0.7in", "2.5in", "0.8in"))
+```
+
+# RESEARCH INTERESTS
+
+-   Technologies, TECH, and AI in Social Work and Social Services
+-   Parenting, Fathers, Stepfamily Devekioment
+-   Social Work Practice with Parents and Children
+-   Intervention Design, Development and Program Evaluation
+-   Quantitative Research Methods and Adv Statistics
+-   Large Text Data Analysis & Natural Language Processing
+
+# ACADEMIC APPOINTMENTS
+
+```{r}
+tribble(
+  ~Years, ~Position, ~Institution,
+  "2023-present", "Assistant Professor, Department of Social Work", "National University of Singapore",
+  "2022-2023", "Research Fellow", "A*STAR, Singapore",
+  "2021-2023", "Research Fellow, Social Service Research Centre", "National University of Singapore"
+) %>%
+  create_table(widths = c("1.2in", "2.8in", "2.5in"))
+```
+
+# PUBLICATIONS
+
+## Peer-Reviewed Journal Articles (First Author)
+
+```{r}
+read_csv("pub_published_table.csv") %>%
+  format_publications()
+```
+
+## Peer-Reviewed Journal Articles (Co-Authored)
+
+```{r}
+read_csv("pub_coauthor_table.csv") %>%
+  format_publications()
+```
+
+## Manuscripts Under Review
+
+```{r}
+read_csv("pub_inreview_table.csv") %>%
+  format_publications()
+```
+
+# RESEARCH FUNDING AND AWARDS
+
+```{r}
+tribble(
+  ~Year, ~Award, ~Institution, ~Amount,
+  "2024", "Teaching Enhancement Grant", "NUS", "$15000",
+  "2022", "Summer Institutes of Computational Social Science", "SICSS", "",
+  "2021", "Injury Violence & Prevention Fellowship", "Injury Prevention Research Center, UNC", "$3,000",
+  "2021", "Ee Peng Liang Scholar", "Ee Peng Liang Memorial Fund, NUS", "",
+  "2020", "Injury Violence & Prevention Fellowship", "Injury Prevention Research Center, UNC", "$3,000",
+  "2017", "Merit Assistantship (4 years funding)", "Graduate school, UNC", "",
+  "2014", "Alice Goh Scholarship", "NUS", ""
+) %>%
+  arrange(desc(Year)) %>%
+  create_table(widths = c("0.8in", "2.3in", "2.5in", "0.9in"))
+```
+
+# RESEARCH PROJECTS
+
+```{r}
+read_csv("research_proj.csv") %>%
+  arrange(desc(year)) %>%
+  select(`funder/collaborator`, project, year, role) %>%
+  create_table(widths = c("1.3in", "3in", "0.8in", "1.4in"))
+```
+
+# TEACHING EXPERIENCE
+
+## Primary Instructor
+
+```{r}
+tribble(
+  ~Year, ~Course, ~Institution,
+  "2025", "SW3224 Technology in Social Work", "NUS",
+  "2025", "SW4103 Adv Research & Evaluation", "NUS",
+  "2024", "SW4103 Adv Research & Evaluation", "NUS",
+  "2023", "Practice Research I and II", "NUS",
+  "2023", "SW4103 Adv Research & Evaluation", "NUS",
+  "2022", "Research Skills for Social Service Professionals", "Social Service Research Centre",
+  "2014", "Financial Cases: Assessment and Intervention", "Academy of Human Development Singapore"
+) %>%
+  create_table(widths = c("1in", "3in", "2.5in"))
+```
+
+## Graduate Student Instructor
+
+```{r}
+tribble(
+  ~Year, ~Course, ~Institution,
+  "2021", "SOWO 918: Applied Regression Analysis and GLM", "UNC Chapel Hill",
+  "2020", "SOWO 911: Introduction to Social Statistics", "UNC Chapel Hill",
+  "2019", "SOWO 500: Human Development in Context", "UNC Chapel Hill",
+  "2018", "SOWO 800: Evaluation of Social Work Intervention", "UNC Chapel Hill"
+) %>%
+  create_table(widths = c("1in", "3in", "2.5in"))
+```
+
+# SERVICE AND PROFESSIONAL ACTIVITIES
+
+## Research Consultancy
+
+```{r}
+tribble(
+  ~Year, ~Organization, ~Role,
+  "2021-2023", "Fei Yue Community Services", "Research Consultant",
+  "2017-2018", "The Samaritans of Singapore SOS", "Research Consultant",
+  "2017-2018", "Agency for Integrated Care AIC", "Research Consultant"
+) %>%
+  create_table(widths = c("1.2in", "3in", "2.3in"))
+```
+
+## Community Service
+
+```{r}
+tribble(
+  ~Year, ~Role, ~Committee,
+  "2024-", "Member", "SWITch SW & Informatics Champions",
+  "2024-", "Advisor", "Fei Yue IRB",
+) %>%
+  create_table(widths = c("1.2in", "1.8in", "3.5in"))
+```
+
+
+## Editorial Service
+
+```{r}
+tribble(
+  ~Year, ~Role, ~Journal,
+  "2013-2017", "Editorial Assistant", "Asia Pacific Journal of Social Work and Development",
+  "2020-present", "Ad Hoc Reviewer", "Journal of Child & Family Studies",
+  "2020-present", "Ad Hoc Reviewer", "Journal of Family Violence",
+  "2020-present", "Ad Hoc Reviewer", "Child & Family Social Work",
+  "2020-present", "Ad Hoc Reviewer", "Family Relations",
+  "2020-present", "Ad Hoc Reviewer", "Current Psychology",
+  "2020-present", "Ad Hoc Reviewer", "Child & Youth Service Review"
+) %>%
+  create_table(widths = c("1.2in", "1.8in", "3.5in"))
+```
+
+# PROFESSIONAL REFERENCES
+
+```{r}
+tribble(
+  ~Name, ~Title, ~Contact,
+  "Mimi Chapman, Ph.D.", "Associate Dean for Doctoral Education; Frank A. Daniels Distinguished Professor", "mimi@email.unc.edu",
+  "Chen Ding-Geng, Ph.D.", "Kuralt Distinguished Professor, School of Social Work; Professor in Biostatistics", "dinchen@email.unc.edu",
+  "David Ansong, Ph.D.", "Kuralt Early Career Distinguished Associate Professor", "ansong@email.unc.edu",
+  "Paul Lanier, Ph.D.", "Kuralt Distinguished Associate Professor; Associate Director, Jordan Institute of Families", "planier@email.unc.edu"
+) %>%
+  create_table(widths = c("2in", "3.5in", "1in"))
+```
