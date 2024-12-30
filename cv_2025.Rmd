@@ -96,7 +96,7 @@ create_table <- function(data, widths = NULL, align = NULL) {
 Assistant Professor\
 Department of Social Work\
 National University of Singapore\
-gerard\@nus.edu.sg • gerardchung.com
+gerard\@nus.edu.sg | gerardchung.com
 
 *Last Updated: December 2024*
 
